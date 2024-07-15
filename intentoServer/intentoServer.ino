@@ -11,13 +11,14 @@
 #include "LittleFS.h"
 #include <Arduino_JSON.h>
 
-#define pinSuciedad 4
+#define pinSuciedad 36
 #define pinCO2 32
+#define pinFiltro 4
 
 // Replace with your network credentials
 
-const char* ssid = "";
-const char* password = "";
+const char* ssid = "Estrella";
+const char* password = "mikk123456789";
 
 // Create AsyncWebServer object on port 80
 AsyncWebServer server(80);
@@ -108,6 +109,8 @@ void setup() {
   initWiFi();
   initLittleFS();
   initWebSocket();
+
+  Serial.println("Cosas iniciadas");
 
   vTaskDelay(3000 / portTICK_PERIOD_MS);
 
