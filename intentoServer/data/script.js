@@ -43,3 +43,7 @@ function onMessage(event) {
         document.getElementById(key).innerHTML = myObj[key];
     }
 }
+
+function funcionBoton() {
+    websocket.send("activarServo");
+}

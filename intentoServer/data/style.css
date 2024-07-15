@@ -37,3 +37,15 @@ body {
     font-size: 1.2rem;
     color: #1282A2;
 }
+
+.boton-rojo {
+    background-color: red;
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    font-size: 16px;
+    cursor: pointer;
+    display: inline-block;
+    text-align: center;
+    margin-top: 20px;
+}

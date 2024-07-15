@@ -11,14 +11,19 @@
 #include "LittleFS.h"
 #include <Arduino_JSON.h>
 
+#include <ESP32Servo.h>
+
 #define pinSuciedad 36
 #define pinCO2 32
 #define pinFiltro 4
 
+Servo servo;
+int valServo;
+
 // Replace with your network credentials
 
-const char* ssid = "Estrella";
-const char* password = "mikk123456789";
+const char* ssid = "Gorrionsss";
+const char* password = "angelchupapito";
 
 // Create AsyncWebServer object on port 80
 AsyncWebServer server(80);
@@ -41,6 +46,13 @@ String getSensorReadings(){
   readings["co2"] = String(analogRead(pinCO2));
   String jsonString = JSON.stringify(readings);
   return jsonString;
+}
+
+void activarServoFuncion() {
+  for (int pos = 50; pos >= 10; pos -= 1) { 
+    servo.write(pos);              
+    delay(15);   
+  }
 }
 
 // Initialize LittleFS
@@ -70,15 +82,19 @@ void notifyClients(String sensorReadings) {
 void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
   AwsFrameInfo *info = (AwsFrameInfo*)arg;
   if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT) {
-    //data[len] = 0;
-    //String message = (char*)data;
+    data[len] = 0;
+    String message = (char*)data;
     // Check if the message is "getReadings"
-    //if (strcmp((char*)data, "getReadings") == 0) {
+    if (strcmp((char*)data, "getReadings") == 0) {
       //if it is, send current sensor readings
       String sensorReadings = getSensorReadings();
       Serial.print(sensorReadings);
       notifyClients(sensorReadings);
-    //}
+    } else {
+      if (strcmp((char*) data, "activarServo") == 0) {
+        activarServoFuncion();
+      }
+    }
   }
 }
 
@@ -109,6 +125,9 @@ void setup() {
   initWiFi();
   initLittleFS();
   initWebSocket();
+  servo.attach(4);
+
+  vTaskDelay(1000 / portTICK_PERIOD_MS);
 
   Serial.println("Cosas iniciadas");
 
