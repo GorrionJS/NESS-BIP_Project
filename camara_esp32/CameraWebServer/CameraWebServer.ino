@@ -36,8 +36,8 @@
 // ===========================
 // Enter your WiFi credentials
 // ===========================
-const char *ssid = "HaoXu";
-const char *password = "Diablo890";
+const char *ssid = "UTCN-Guest";
+const char *password = "utcluj.ro";
 
 void startCameraServer();
 void setupLedFlash(int pin);

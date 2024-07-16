@@ -62,16 +62,9 @@ String getSensorReadings(){
 }
 
 void activarServoFuncion() {
-  for (int pos = 80; pos >= 40; pos -= 1) { 
-    delay(30);
-    servo.write(pos);              
-    delay(30);   
-  }
-  for (int pos = 40; pos <= 80; pos += 1) { 
-    delay(30);
-    servo.write(pos);              
-    delay(30);   
-  }
+  /*delay(1000);
+  servo.write(0);
+  delay(1000);*/
 }
 
 float concentracion_liquid(){
@@ -120,6 +113,7 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
       notifyClients(sensorReadings);
     } else {
       if (strcmp((char*)data, "activarServo") == 0) {
+        Serial.print("AAAAAAAAA0");
         activarServoFuncion();
       }
     }
@@ -155,7 +149,7 @@ void setup() {
   initWebSocket();
 
   // Pin servo
-  servo.attach(22);
+  servo.attach(4);
   
   pinMode(pinFiltro, OUTPUT);
   
