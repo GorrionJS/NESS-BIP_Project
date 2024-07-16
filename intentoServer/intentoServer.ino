@@ -1,9 +1,12 @@
-/*********
+/*********+
   Rui Santos & Sara Santos - Random Nerd Tutorials
   Complete instructions at https://RandomNerdTutorials.com/esp32-websocket-server-sensor/
   Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files.
   The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 *********/
+
+//Mahmoud was here :)
+
 #include <Arduino.h>
 #include <WiFi.h>
 #include <AsyncTCP.h>
@@ -13,17 +16,26 @@
 
 #include <ESP32Servo.h>
 
-#define pinSuciedad 36
-#define pinCO2 32
-#define pinFiltro 4
+#define pinSuciedad 33
+#define pinCO2 34
+#define pinFiltro 18
+int read_suciedad;
+int read_gas;
 
 Servo servo;
 int valServo;
 
-// Replace with your network credentials
+float pGas;
 
-const char* ssid = "Gorrionsss";
-const char* password = "angelchupapito";
+const float K_O2 = 1.3e-3; // Para el oxígeno a 25 °C en mol/(L·atm)
+float P_total = 101.3;
+float P_detected; //Gases detectados
+float P_O2;
+float C_O2; // Concentración de oxígeno mol/L
+
+
+const char* ssid = "UTCN-Guest";
+const char* password = "utcluj.ro";
 
 // Create AsyncWebServer object on port 80
 AsyncWebServer server(80);
@@ -39,23 +51,34 @@ unsigned long lastTime = 0;
 unsigned long timerDelay = 3000;
 
 
-// Get Sensor Readings and return JSON object
 String getSensorReadings(){
-  // Aquí tenemos que leer del sensor de suciedad
-  readings["suciedad"] = String(analogRead(pinSuciedad));
-  readings["co2"] = String(analogRead(pinCO2));
+  read_suciedad = analogRead(pinSuciedad);
+  read_gas = analogRead(pinCO2);
+  readings["suciedad"] = String(read_suciedad);
+  readings["co2"] = String(concentracion_liquid());
   String jsonString = JSON.stringify(readings);
   return jsonString;
 }
 
 void activarServoFuncion() {
-  for (int pos = 50; pos >= 10; pos -= 1) { 
+  for (int pos = 80; pos >= 40; pos -= 1) { 
     servo.write(pos);              
-    delay(15);   
+    delay(60);   
   }
 }
 
-// Initialize LittleFS
+float concentracion_liquid(){
+  P_detected = read_gas; 
+  P_O2 = P_total - P_detected;
+  if (P_O2 < 0){P_O2 *= -1;}
+  //(1 atm = 101.325 kPa)
+  P_O2 = P_O2 / 10.1325;
+  
+  // Concentración de oxigeno disuelto (Ley de Henry)
+  C_O2 = K_O2 * P_O2;
+  return C_O2;
+}
+
 void initLittleFS() {
   if (!LittleFS.begin(true)) {
     Serial.println("An error has occurred while mounting LittleFS");
@@ -84,14 +107,12 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
   if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT) {
     data[len] = 0;
     String message = (char*)data;
-    // Check if the message is "getReadings"
     if (strcmp((char*)data, "getReadings") == 0) {
-      //if it is, send current sensor readings
       String sensorReadings = getSensorReadings();
       Serial.print(sensorReadings);
       notifyClients(sensorReadings);
     } else {
-      if (strcmp((char*) data, "activarServo") == 0) {
+      if (strcmp((char*)data, "activarServo") == 0) {
         activarServoFuncion();
       }
     }
@@ -125,8 +146,12 @@ void setup() {
   initWiFi();
   initLittleFS();
   initWebSocket();
-  servo.attach(4);
 
+  // Pin servo
+  servo.attach(22);
+  
+  pinMode(pinFiltro, OUTPUT);
+  
   vTaskDelay(1000 / portTICK_PERIOD_MS);
 
   Serial.println("Cosas iniciadas");
@@ -140,7 +165,6 @@ void setup() {
 
   server.serveStatic("/", LittleFS, "/");
 
-  // Start server
   server.begin();
 }
 
@@ -148,8 +172,19 @@ void loop() {
   if ((millis() - lastTime) > timerDelay) {
     String sensorReadings = getSensorReadings();
     Serial.println(sensorReadings);
+    if (read_suciedad > -30){ //CAMBIAR
+      Serial.println("Demasiadas partículas");
+      delay(1000);
+      digitalWrite(pinFiltro,LOW);
+      delay(1000);
+    }else{
+      delay(1000);
+      digitalWrite(pinFiltro,HIGH);
+      delay(1000);
+    }
     notifyClients(sensorReadings);
     lastTime = millis();
   }
+  
   ws.cleanupClients();
 }
