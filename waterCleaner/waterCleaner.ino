@@ -13,6 +13,7 @@
 #include <ESPAsyncWebServer.h>
 #include "LittleFS.h"
 #include <Arduino_JSON.h>
+#include <HTTPClient.h>
 
 #include <ESP32Servo.h>
 
@@ -48,7 +49,7 @@ JSONVar readings;
 
 // Timer variables
 unsigned long lastTime = 0;
-unsigned long timerDelay = 3000;
+unsigned long timerDelay = 5000;
 
 
 String getSensorReadings(){
@@ -139,7 +140,7 @@ void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType 
 void initWebSocket() {
   ws.onEvent(onEvent);
   server.addHandler(&ws);
-}
+} 
 
 void setup() {
   Serial.begin(115200);

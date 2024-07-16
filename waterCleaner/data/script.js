@@ -39,7 +39,11 @@ function onMessage(event) {
 
     for (var i = 0; i < keys.length; i++){
         var key = keys[i];
-        document.getElementById(key).innerHTML = myObj[key];
+        if (key == "image") {
+            document.getElementById(key).src = myObj[key];
+        } else {
+            document.getElementById(key).innerHTML = myObj[key];
+        }
     }
 
     // Obtener los valores de suciedad y CO2
