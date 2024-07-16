@@ -63,8 +63,14 @@ String getSensorReadings(){
 
 void activarServoFuncion() {
   for (int pos = 80; pos >= 40; pos -= 1) { 
+    delay(30);
     servo.write(pos);              
-    delay(60);   
+    delay(30);   
+  }
+  for (int pos = 40; pos <= 80; pos += 1) { 
+    delay(30);
+    servo.write(pos);              
+    delay(30);   
   }
 }
 
