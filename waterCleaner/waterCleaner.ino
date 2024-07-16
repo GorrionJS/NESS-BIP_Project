@@ -38,9 +38,9 @@ int valServo;
 unsigned long lastTime = 0;
 unsigned long timerDelay = 5000;
 
-////////////
-// WEBSOCKET
-////////////
+////////////////////////////////////////////////////
+// WEBSOCKET - Insert here your network credentials
+////////////////////////////////////////////////////
 const char* ssid = "UTCN-Guest";
 const char* password = "utcluj.ro";
 
@@ -194,6 +194,8 @@ void setup() {
 
   // Servo pin
   servo.attach(4);
+  delay(1000);
+  servo.write(40);
 
   // Initialices all services
   Serial.begin(115200);
