@@ -11,7 +11,6 @@
 #include "LittleFS.h"
 #include <Arduino_JSON.h>
 #include <HTTPClient.h>
-#include "base64.h"
 
 #include <ESP32Servo.h>
 
@@ -19,13 +18,8 @@
 #define pinCO2 32
 #define pinFiltro 4
 
-
-String IP_CAMARA = "http://192.168.43.152/";
-
 Servo servo;
 int valServo;
-
-HTTPClient http;
 
 // Replace with your network credentials
 
@@ -44,7 +38,6 @@ JSONVar readings;
 // Timer variables
 unsigned long lastTime = 0;
 unsigned long timerDelay = 5000;
-unsigned long camaraDelay = 5000;
 
 
 // Get Sensor Readings and return JSON object
@@ -128,24 +121,6 @@ void initWebSocket() {
   server.addHandler(&ws);
 } 
 
-String imageToBase64(uint8_t *imageData, size_t length){
-    base64_encodestate b64state;
-    base64_init_encodestate(&b64state);
-
-    const int outputSize = base64_needed_encoded_length(length);
-    char *base64Buffer = new char[outputSize];
-
-    int encodedLength = base64_encode_block((char *)imageData, length, base64Buffer, &b64state);
-    encodedLength += base64_encode_blockend(base64Buffer + encodedLength, &b64state);
-
-    String base64String(base64Buffer);
-    delete[] base64Buffer;
-
-    return base64String;
-
-
-}
-
 void setup() {
   Serial.begin(115200);
   initWiFi();
@@ -173,88 +148,7 @@ void setup() {
 void loop() {
   if ((millis() - lastTime) > timerDelay) {
     String sensorReadings = getSensorReadings();
-    //Serial.println(sensorReadings);
-
-    if ((millis() - lastTime) > camaraDelay) {
-      // MOMENTO TOMAR IMAGEN Y GUARDARLA
-      String ipSolicitar = IP_CAMARA + "capture";
-      // Aquí hay que hacer la petición GET
-      Serial.println(ipSolicitar);
-      http.begin(ipSolicitar);
-      int httpCode = http.GET();
-
-      vTaskDelay(1000 / portTICK_PERIOD_MS);
-
-      if (httpCode == HTTP_CODE_OK) {
-        // Ahora hemos hecho que primero obtenga la imagen
-
-        http.end();
-
-        Serial.println("La imagen se ha cogido perfectamente");
-        ipSolicitar = IP_CAMARA + "saved-photo";
-        Serial.println(ipSolicitar);
-        http.begin(ipSolicitar);
-
-        Serial.println("Se ha solicitado la imagen");
-
-        httpCode = http.GET();
-        Serial.print(httpCode);
-
-        if (httpCode == HTTP_CODE_OK) {
-
-          Serial.println("La imagen se ha guardado");
-
-          // Tenemos la imagen, ahora falta pasarla a base64
-          // Obtenemos la imagen
-          WiFiClient * stream = http.getStreamPtr();
-
-          Serial.println("Imagen obtenida");
-
-          // Calculamos tamaño imagen
-          int len = http.getSize();
-          uint8_t *imagenBuffer = new uint8_t[len];
-          int index = 0;
-
-          Serial.println("Se va a entrar en el loop");
-
-          while (http.connected() && len > 0) {
-            size_t size = stream->available();
-
-            if (size) {
-              // Lee los bytes de la imagen en el buffer
-              int c = stream->readBytes(imagenBuffer + index, size);
-
-              index += c;
-              len -= c;
-            }
-
-            vTaskDelay(1 / portTICK_PERIOD_MS);
-          }
-
-          Serial.println("Se ha salido del loop");
-
-          // Tenemos el texto claro en imagenBuffer
-
-          vTaskDelay(1000 / portTICK_PERIOD_MS);
-          
-          // Ahora nos hace falta añadirla al documento JSON (getSensorReadings)
-            String imagenBase64 = imageToBase64(imagenBuffer, index);
-            readings["imagen"] = imagenBase64;         
-
-          //Serial.println(imagenBase64Char);
-
-          delete[] imagenBuffer;
-        } else {
-          Serial.println("No se ha podido cargar la imagen");
-        }
-      } else {
-        Serial.println("No se ha podido tomar la imagen");
-      }
-      
-      http.end();
-
-    }
-
+    Serial.println(sensorReadings);
     notifyClients(sensorReadings);
     lastTime = millis();
   }

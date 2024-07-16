@@ -1,29 +1,45 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>ESP IOT DASHBOARD</title>
+        <title>NESS - BIP Project</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="icon" type="image/png" href="favicon.png">
+        <link rel="icon" type="image/png" href="../../icons/wave.png">
         <link rel="stylesheet" type="text/css" href="style.css">
     </head>
     <body>
+        <!-- Top-bar -->
         <div class="topnav">
-            <h1>SENSOR READINGS (WEBSOCKET)</h1>
+            <h1>Natural Environment Safety System</h1>
         </div>
+
+        <!-- Containers -->
         <div class="content">
             <div class="card-grid">
                 <div class="card">
-                    <p class="card-title"><i class="fas fa-thermometer-threequarters" style="color:#059e8a;"></i> Suciedad:</p>
+                    <p class="card-title"><i class="fas fa-thermometer-threequarters" style="color:#059e8a;"></i> Dirt</p>
                     <p class="reading"><span id="suciedad"></span> %</p>
                 </div>
                 <div class="card">
-                    <p class="card-title"><i class="fas fa-thermometer-threequarters" style="color:#059e8a;"></i> CO2:</p>
-                    <p class="reading"><span id="co2"></span> g</p>
+                    <p class="card-title"><i class="fas fa-thermometer-threequarters" style="color:#059e8a;"></i> Carbon dioxide</p>
+                    <p class="reading"><span id="co2"></span> ppm</p>
                 </div>
             </div>
-            <img id="Image" alt="Base64 Image" />
-            <button class="boton-rojo" onclick="funcionBoton()">Haz clic aquí</button>
+            <button class="boton-azul-claro" onclick="funcionBoton()">Push here to move the Servo</button>
         </div>
+
+        <!-- Bottom-bar -->
+        <div class="bottom-bar">
+            <p>© 2024 Natural Environment Safety System - All Rights Reserved</p>
+        </div>
+
+        <!-- Right-bar -->
+        <div class="right-sidebar">
+            <a href="#link1">Link 1</a>
+            <a href="#link2">Link 2</a>
+            <a href="#link3">Link 3</a>
+            <a href="#link4">Link 4</a>
+        </div>
+
         <script src="script.js"></script>
     </body>
 </html>
