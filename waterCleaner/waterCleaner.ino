@@ -41,8 +41,8 @@ unsigned long timerDelay = 5000;
 ////////////////////////////////////////////////////
 // WEBSOCKET - Insert here your network credentials
 ////////////////////////////////////////////////////
-const char* ssid = "UTCN-Guest";
-const char* password = "utcluj.ro";
+const char* ssid = "YOUR_WIFI_ID";
+const char* password = "PASSWORD";
 
 // Create AsyncWebServer object on port 80
 AsyncWebServer server(80);
