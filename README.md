@@ -1,4 +1,4 @@
-# NESS---BIP-Project
+# NESS - BIP-Project
 
 **NESS** _(Natural Environment Safety System)_ is a project whose objective is to develop an **economical** and **efficient solution** to the serious problem of **contamination** of our main **drinking water suppliers,** such as lakes and reservoirs.
 
